@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Grid</title>
+  <meta name="theme-color" content="#FAFAFA">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/" aria-label="The Grid, home">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1V21M14 1V21M1 8H21M1 14H21" stroke="currentColor"/></svg>
+      <span>The Grid</span>
+    </a>
+    <div class="search">
+      <label for="search" class="mono">SEARCH</label>
+      <input id="search" type="search" placeholder="words, tags, notes, sources" autocomplete="off">
+    </div>
+    <nav class="queues" aria-label="Queues">
+      <span class="queue soon mono" title="Coming in phase 5">TRIAGE</span>
+      <span class="queue soon mono" title="Coming in phase 2">INBOX</span>
+      <span class="queue active mono">LIBRARY</span>
+    </nav>
+  </header>
+
+  <div class="body">
+    <aside class="side">
+      <button class="upload-btn mono" id="uploadBtn">+ ADD IMAGES</button>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+      <p class="hint">Or drop images anywhere, or paste with Cmd+V.</p>
+
+      <div class="side-group">
+        <div class="label mono">LIBRARY</div>
+        <button class="side-link" id="allLink"><span>All items</span><span class="mono count" id="totalCount">0</span></button>
+      </div>
+
+      <div class="side-group">
+        <div class="label mono">TAGS</div>
+        <div id="tagList" class="tag-list"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="filterbar">
+        <span class="label mono">FILTER</span>
+        <div id="activeFilters" class="filters"></div>
+        <span class="mono status" id="status"></span>
+      </div>
+      <div class="board">
+        <div id="grid" class="grid" aria-live="polite"></div>
+        <div id="empty" class="empty" hidden>
+          <p class="mono">NOTHING HERE YET</p>
+          <p>Drop some images in to start your library.</p>
+        </div>
+      </div>
+    </main>
+
+    <aside class="panel" id="panel" hidden aria-label="Selected item"></aside>
+  </div>
+
+  <div class="dropzone" id="dropzone" hidden>
+    <div class="mono">DROP TO ADD TO THE GRID</div>
+  </div>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
