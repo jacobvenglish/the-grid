@@ -63,6 +63,32 @@
     <aside class="panel" id="panel" hidden aria-label="Selected item"></aside>
   </div>
 
+  <dialog class="sheet" id="batchSheet" aria-labelledby="batchTitle">
+    <form method="dialog" class="sheet-inner" id="batchForm">
+      <div class="sheet-head">
+        <h2 id="batchTitle" class="mono">ADDING 0 IMAGES</h2>
+        <p>Anything you add here goes on every image in this batch. You can still edit each one after.</p>
+      </div>
+      <div class="thumbs" id="batchThumbs"></div>
+      <div class="row">
+        <label for="batchTags" class="label mono">TAGS FOR ALL</label>
+        <input id="batchTags" type="text" placeholder="poster, serif, grain" autocomplete="off">
+      </div>
+      <div class="row">
+        <label for="batchNote" class="label mono">NOTE FOR ALL</label>
+        <textarea id="batchNote" rows="2" placeholder="Optional"></textarea>
+      </div>
+      <div class="row">
+        <label for="batchSource" class="label mono">SOURCE LINK FOR ALL</label>
+        <input id="batchSource" type="url" placeholder="https://">
+      </div>
+      <div class="actions">
+        <button class="btn primary" value="add" id="batchAdd">ADD IMAGES</button>
+        <button class="btn" value="cancel" formnovalidate>CANCEL</button>
+      </div>
+    </form>
+  </dialog>
+
   <div class="dropzone" id="dropzone" hidden>
     <div class="mono">DROP TO ADD TO THE GRID</div>
   </div>

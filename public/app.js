@@ -310,10 +310,55 @@ async function imageSize(file) {
   }
 }
 
+// For 2+ images: ask once for tags, a note and a source that apply to the whole batch.
+// Resolves to { tags, note, source }, or null if cancelled.
+function askBatchDetails(files, sourceUrl) {
+  return new Promise((resolve) => {
+    const sheet = $('#batchSheet');
+    const thumbs = $('#batchThumbs');
+    const urls = [];
+    thumbs.replaceChildren();
+    for (const file of files.slice(0, 12)) {
+      const url = URL.createObjectURL(file);
+      urls.push(url);
+      thumbs.append(el('img', { src: url, alt: '' }));
+    }
+    if (files.length > 12) thumbs.append(el('div', { class: 'more', text: `+${files.length - 12}` }));
+
+    $('#batchTitle').textContent = `ADDING ${files.length} IMAGES`;
+    $('#batchAdd').textContent = `ADD ${files.length} IMAGES`;
+    $('#batchTags').value = state.tag || '';
+    $('#batchNote').value = '';
+    $('#batchSource').value = sourceUrl;
+
+    sheet.addEventListener('close', () => {
+      urls.forEach((u) => URL.revokeObjectURL(u));
+      if (sheet.returnValue !== 'add') return resolve(null);
+      resolve({
+        tags: $('#batchTags').value,
+        note: $('#batchNote').value.trim(),
+        source: $('#batchSource').value.trim(),
+      });
+    }, { once: true });
+
+    sheet.returnValue = '';
+    sheet.showModal();
+    $('#batchTags').focus();
+  });
+}
+
 async function uploadFiles(fileList, sourceUrl = '') {
   const files = [...fileList].filter((f) => f.type.startsWith('image/'));
   if (!files.length) return;
+
+  let details = { tags: '', note: '', source: sourceUrl };
+  if (files.length > 1) {
+    details = await askBatchDetails(files, sourceUrl);
+    if (!details) return; // cancelled
+  }
+
   let done = 0;
+  let lastId = null;
   const failed = [];
   for (const file of files) {
     setStatus(`UPLOADING ${done + 1}/${files.length}`);
@@ -322,15 +367,20 @@ async function uploadFiles(fileList, sourceUrl = '') {
     form.append('file', file);
     form.append('width', width);
     form.append('height', height);
-    if (sourceUrl) form.append('source_url', sourceUrl);
+    if (details.source) form.append('source_url', details.source);
+    if (details.tags) form.append('tags', details.tags);
+    if (details.note) form.append('note', details.note);
     try {
-      await api('/api/items', { method: 'POST', body: form });
+      const item = await api('/api/items', { method: 'POST', body: form });
+      lastId = item.id;
       done++;
     } catch (e) {
       failed.push(`${file.name}: ${e.message}`);
     }
   }
   await refresh();
+  // A single image opens straight away so you can tag it.
+  if (files.length === 1 && lastId) select(lastId);
   if (failed.length) alert(`Some images did not upload:\n\n${failed.join('\n')}`);
 }
 

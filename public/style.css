@@ -90,6 +90,18 @@ button { cursor: pointer; }
 .panel-wrap { position: relative; }
 .saved { color: var(--quiet); font-family: var(--mono); font-size: 11px; min-height: 14px; }
 
+/* Batch upload sheet */
+.sheet { border: 1px solid var(--ink); border-radius: 0; padding: 0; width: min(560px, calc(100vw - 32px)); background: var(--bg); color: var(--ink); box-shadow: 0 0 24px var(--accent); }
+.sheet::backdrop { background: rgba(10, 10, 10, 0.4); }
+.sheet-inner { padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.sheet-head h2 { margin: 0 0 6px; font-size: 14px; font-weight: 500; }
+.sheet-head p { margin: 0; font-size: 14px; color: var(--quiet); line-height: 1.45; }
+.sheet .row { display: flex; flex-direction: column; gap: 8px; }
+.sheet input, .sheet textarea { border: 1px solid var(--ink); border-radius: 0; background: #fff; padding: 10px; font-size: 14px; width: 100%; }
+.thumbs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.thumbs img { width: 64px; height: 64px; object-fit: cover; border: 1px solid var(--ink); flex: none; }
+.thumbs .more { width: 64px; height: 64px; border: 1px solid var(--ink); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; flex: none; }
+
 /* Drop overlay */
 .dropzone { position: fixed; inset: 16px; border: 2px dashed var(--accent); background: rgba(250, 250, 250, 0.92); box-shadow: inset 0 0 40px var(--accent); display: grid; place-items: center; z-index: 50; font-size: 16px; }
 

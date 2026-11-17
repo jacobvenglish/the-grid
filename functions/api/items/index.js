@@ -2,7 +2,7 @@
 // GET  -> list items, newest first. ?q=words&tag=name to filter.
 // POST -> upload one image (form fields: file, width, height, source_url).
 
-import { shapeItem, ITEM_SELECT, cleanFilename, json, fail } from '../../../lib/db.js';
+import { shapeItem, ITEM_SELECT, cleanFilename, cleanTag, json, fail } from '../../../lib/db.js';
 
 const TAG_MATCH = `EXISTS (SELECT 1 FROM item_tags it JOIN tags t ON t.id = it.tag_id
                    WHERE it.item_id = i.id AND it.approved = 1 AND t.name LIKE ?)`;
@@ -59,10 +59,24 @@ export async function onRequestPost({ request, env }) {
   const filename = cleanFilename(file.name);
   const createdAt = new Date().toISOString();
 
-  await env.DB.prepare(
-    `INSERT INTO items (id, file_key, filename, mime, width, height, source_url, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(id, key, filename, file.type, width, height, source, createdAt).run();
+  const note = String(form.get('note') || '').slice(0, 5000);
+  // Tags sent with the upload (comma separated), applied to this image.
+  const tags = [...new Set(String(form.get('tags') || '').split(',').map(cleanTag).filter(Boolean))].slice(0, 60);
+
+  const stmts = [
+    env.DB.prepare(
+      `INSERT INTO items (id, file_key, filename, mime, width, height, source_url, note, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(id, key, filename, file.type, width, height, source, note, createdAt),
+  ];
+  for (const name of tags) {
+    stmts.push(env.DB.prepare('INSERT OR IGNORE INTO tags (name) VALUES (?)').bind(name));
+    stmts.push(env.DB.prepare(
+      `INSERT OR IGNORE INTO item_tags (item_id, tag_id, origin)
+       SELECT ?, id, 'manual' FROM tags WHERE name = ?`
+    ).bind(id, name));
+  }
+  await env.DB.batch(stmts);
 
   const row = await env.DB.prepare(`${ITEM_SELECT} WHERE i.id = ?`).bind(id).first();
   return json(shapeItem(row), 201);
