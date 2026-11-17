@@ -1,0 +1,31 @@
+-- The Grid: database schema (phase 1)
+-- Paste this whole file into the D1 console and run it once.
+
+CREATE TABLE IF NOT EXISTS items (
+  id          TEXT PRIMARY KEY,
+  file_key    TEXT NOT NULL,
+  filename    TEXT NOT NULL,
+  mime        TEXT NOT NULL,
+  width       INTEGER,
+  height      INTEGER,
+  source_url  TEXT,
+  note        TEXT NOT NULL DEFAULT '',
+  status      TEXT NOT NULL DEFAULT 'library',  -- later: triage, tagging, inbox
+  created_at  TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tags (
+  id    INTEGER PRIMARY KEY AUTOINCREMENT,
+  name  TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS item_tags (
+  item_id   TEXT NOT NULL,
+  tag_id    INTEGER NOT NULL,
+  origin    TEXT NOT NULL DEFAULT 'manual',     -- later: ai, caption
+  approved  INTEGER NOT NULL DEFAULT 1,
+  PRIMARY KEY (item_id, tag_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_items_created ON items (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_item_tags_tag ON item_tags (tag_id);
